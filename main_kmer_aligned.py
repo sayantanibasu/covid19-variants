@@ -6,6 +6,7 @@ import pandas as pd
 from scipy import stats
 import time
 from sklearn.cluster import KMeans
+from sklearn.feature_extraction.text import CountVectorizer
 import datetime
 
 t1=time.perf_counter()
@@ -16,7 +17,9 @@ proteins,vectors=preprocessing.prot_vec('protVec_100d_3grams.csv') #proteins and
     
 df3=pd.read_csv('nextstrain_ncov_global_metadata.tsv',sep='\t') #subset of spike proteins
 
-unaligned_sequences="unaligned_sequences.fasta"
+aligned_sequences="aligned_sequences.fasta"
+
+ids2,seqs2=preprocessing.sequences(aligned_sequences)
 
 sequence_vectors_dir="sequence_vectors/"
 
@@ -40,17 +43,42 @@ dates_subset=[]
 ids_subset=[]
 seqs_subset=[]
 
-f2=open(unaligned_sequences, "w")
+
 for i in range(len(ids_all)):
     if ids_all[i] in df3['gisaid_epi_isl'].values:
-        f2.write(">"+ids_all[i]+"\n"+seqs_all[i] +"\n")
         ids_subset.append(ids_all[i])
         dates_subset.append(dates_all[i])
         seqs_subset.append(seqs_all[i])
         cnt1=cnt1+1
-f2.close()
 
 print(cnt1)
+
+seqs_subset=[]
+cnt2=0
+
+for i in range(len(ids_subset)):
+    if ids2[i]==ids_subset[i]:
+        seqs_subset.append(seqs2[i])
+        cnt2=cnt2+1
+
+print(cnt2)
+
+vectorizer=CountVectorizer()
+
+def kmers(seq,k=3):
+    words=[seq[x:x+k].lower() for x in range(len(seq)-k+1)]
+    sentence=' '.join(words)
+    return sentence
+
+sentences=[]
+for i in range(len(ids_subset)):
+    sentences.append(kmers(seqs_subset[i],k=3))
+
+X=vectorizer.fit_transform(sentences)
+#print(X.shape)
+#print(vectorizer.get_feature_names())
+#X.toarray=array of 3-mers for every sequence
+X2=X.toarray()
 
 cnt=0
 
@@ -58,15 +86,14 @@ for i in range(len(ids_subset)):
     if ids_subset[i] in df3['gisaid_epi_isl'].values:
         cnt=cnt+1
         print(cnt)
-        m=preprocessing.sequence_to_vec(seqs_subset[i],proteins,vectors) #converting full sequence to vector
         f=open(sequence_vectors_dir+str(dates_subset[i])+".txt",'a')
-        f.write(str(seqs_subset[i])+"\t"+str(m)+"\n")
+        f.write(str(seqs_subset[i])+"\t"+str(X2[i].tolist())+"\n")
         f.close()
-
-print(cnt)
 
 t2=time.perf_counter()
 
 total_time=t2-t1
+
+print(cnt)
 
 print("Time : ",total_time)

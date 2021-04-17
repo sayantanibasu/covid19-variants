@@ -1,1 +1,1 @@
-# covid19-variant-detection
+# covid19-variants

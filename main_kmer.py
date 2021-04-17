@@ -19,8 +19,6 @@ df3=pd.read_csv('nextstrain_ncov_global_metadata.tsv',sep='\t') #subset of spike
 
 unaligned_sequences="unaligned_sequences.fasta"
 
-#aligned_sequences="aligned_sequences.fasta"
-
 sequence_vectors_dir="sequence_vectors/"
 
 dates_all=[]
@@ -41,6 +39,7 @@ cnt1=0
 
 dates_subset=[]
 ids_subset=[]
+seqs_subset=[]
 
 f2=open(unaligned_sequences, "w")
 for i in range(len(ids_all)):
@@ -48,21 +47,11 @@ for i in range(len(ids_all)):
         f2.write(">"+ids_all[i]+"\n"+seqs_all[i] +"\n")
         ids_subset.append(ids_all[i])
         dates_subset.append(dates_all[i])
+        seqs_subset.append(seqs_all[i])
         cnt1=cnt1+1
 f2.close()
 
 print(cnt1)
-
-_,seqs=preprocessing.sequences(unaligned_sequences) #unaligned protein sequences
-
-seqs_subset=[]
-
-print("len sequences")
-print(len(seqs))
-print(len(dates_subset))
-
-for i in range(len(ids_subset)):
-    seqs_subset.append(seqs[i]) #collecting all sequences
 
 vectorizer=CountVectorizer()
 
@@ -78,29 +67,23 @@ for i in range(len(ids_subset)):
 X=vectorizer.fit_transform(sentences)
 #print(X.shape)
 #print(vectorizer.get_feature_names())
+#X.toarray=array of 3-mers for every sequence
 X2=X.toarray()
-
-dates_unique=list(df3['Collection Data'].unique()) #collecting unique dates for clustering
 
 cnt=0
 
-for i in range(len(dates_unique)):
-    print(dates_unique[i])
-    for j in range(len(dates_subset)):
-        if dates_subset[j]==datetime.datetime.strptime(dates_unique[i],'%m/%d/%y').strftime('%Y-%m-%d'):
-            #code for writing sequences to files
-            print("passed")
-            cnt=cnt+1
-            f=open(sequence_vectors_dir+str(dates_subset[j])+".txt",'a')
-            f.write(str(seqs_subset[j])+"\t"+str(X2[j].tolist())+"\n")
-            f.close()
-#seqs_subset=the sequences
-#X.toarray=array of 3-mers for every sequence
+for i in range(len(ids_subset)):
+    if ids_subset[i] in df3['gisaid_epi_isl'].values:
+        cnt=cnt+1
+        print(cnt)
+        f=open(sequence_vectors_dir+str(dates_subset[i])+".txt",'a')
+        f.write(str(seqs_subset[i])+"\t"+str(X2[i].tolist())+"\n")
+        f.close()
 
 t2=time.perf_counter()
 
 total_time=t2-t1
 
-print("Time : ",total_time)
-
 print(cnt)
+
+print("Time : ",total_time)

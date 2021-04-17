@@ -16,7 +16,9 @@ proteins,vectors=preprocessing.prot_vec('protVec_100d_3grams.csv') #proteins and
     
 df3=pd.read_csv('nextstrain_ncov_global_metadata.tsv',sep='\t') #subset of spike proteins
 
-unaligned_sequences="unaligned_sequences.fasta"
+aligned_sequences="aligned_sequences.fasta"
+
+ids2,seqs2=preprocessing.sequences(aligned_sequences)
 
 sequence_vectors_dir="sequence_vectors/"
 
@@ -40,17 +42,25 @@ dates_subset=[]
 ids_subset=[]
 seqs_subset=[]
 
-f2=open(unaligned_sequences, "w")
+
 for i in range(len(ids_all)):
     if ids_all[i] in df3['gisaid_epi_isl'].values:
-        f2.write(">"+ids_all[i]+"\n"+seqs_all[i] +"\n")
         ids_subset.append(ids_all[i])
         dates_subset.append(dates_all[i])
         seqs_subset.append(seqs_all[i])
         cnt1=cnt1+1
-f2.close()
 
 print(cnt1)
+
+seqs_subset=[]
+cnt2=0
+
+for i in range(len(ids_subset)):
+    if ids2[i]==ids_subset[i]:
+        seqs_subset.append(seqs2[i])
+        cnt2=cnt2+1
+
+print(cnt2)
 
 cnt=0
 
@@ -62,6 +72,7 @@ for i in range(len(ids_subset)):
         f=open(sequence_vectors_dir+str(dates_subset[i])+".txt",'a')
         f.write(str(seqs_subset[i])+"\t"+str(m)+"\n")
         f.close()
+
 
 print(cnt)
 
