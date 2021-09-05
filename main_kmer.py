@@ -11,7 +11,7 @@ import datetime
 
 t1=time.perf_counter()
 
-ids,seqs=preprocessing.sequences('spikeprot0407/spikeprot0407.fasta') #all spike proteins
+ids,seqs=preprocessing.sequences('spikeprot0831/spikeprot0831.fasta') #all spike proteins
 
 proteins,vectors=preprocessing.prot_vec('protVec_100d_3grams.csv') #proteins and vectors
     
