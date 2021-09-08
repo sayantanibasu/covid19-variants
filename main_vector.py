@@ -10,11 +10,11 @@ import datetime
 
 t1=time.perf_counter()
 
-ids,seqs=preprocessing.sequences('spikeprot0407/spikeprot0407.fasta') #all spike proteins
+ids,seqs=preprocessing.sequences('spikeprot0904/spikeprot0904.fasta') #all spike proteins
 
 proteins,vectors=preprocessing.prot_vec('protVec_100d_3grams.csv') #proteins and vectors
     
-df3=pd.read_csv('nextstrain_ncov_global_metadata.tsv',sep='\t') #subset of spike proteins
+df3=pd.read_csv('metadata_processed.tsv',sep='\t') #subset of spike proteins
 
 unaligned_sequences="unaligned_sequences.fasta"
 
