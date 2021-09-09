@@ -11,11 +11,11 @@ import datetime
 
 t1=time.perf_counter()
 
-ids,seqs=preprocessing.sequences('spikeprot0831/spikeprot0831.fasta') #all spike proteins
+ids,seqs=preprocessing.sequences('spikeprot0904/spikeprot0904.fasta') #all spike proteins
 
 proteins,vectors=preprocessing.prot_vec('protVec_100d_3grams.csv') #proteins and vectors
     
-df3=pd.read_csv('nextstrain_ncov_global_metadata.tsv',sep='\t') #subset of spike proteins
+df3=pd.read_csv('metadata_processed.tsv',sep='\t') #subset of spike proteins
 
 unaligned_sequences="unaligned_sequences.fasta"
 
@@ -43,7 +43,7 @@ cnt1=0
 dates_subset=[]
 ids_subset=[]
 
-variants=df3['PANGO Lineage'].values
+variants=df3['pango_lineage'].values
 variants_subset=[]
 
 print(variants)
@@ -57,7 +57,7 @@ for i in range(len(ids_all)):
 print(cnt1)
 
 
-variants_date=df3['Collection Data'].values
+variants_date=df3['date'].values
 variants_date_subset=[]
 
 for i in range(len(df3['gisaid_epi_isl'].values)):
@@ -75,7 +75,7 @@ for i in range(len(ids_subset)):
         date_sequence_vectors.append(dates_subset[i]) #collecting corresponding date
         seq_sequence_vectors.append(seqs_all[i]) #collecting corresponding seqs
 
-dates_unique=list(df3['Collection Data'].unique()) #collecting unique dates for clustering
+dates_unique=list(df3['date'].unique()) #collecting unique dates for clustering
 
 flag=0
 dates_rest=[]
